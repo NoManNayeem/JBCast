@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{{ subject|default:"Email from JBCast" }}</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      color: #333;
+      background: #f9f9f9;
+      padding: 20px;
+    }
+    .container {
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 6px;
+      max-width: 600px;
+      margin: auto;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .footer {
+      font-size: 12px;
+      text-align: center;
+      color: #888;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <p>Hi {{ name|default:"there" }},</p>
+
+    <p>{{ body|default:"You have a message from JBCast." }}</p>
+
+    <p>Best regards,<br>
+    The JBCast Team</p>
+  </div>
+
+  <div class="footer">
+    &copy; {{ year|default:"2025" }} JBCast — MailBridge by JB
+  </div>
+</body>
+</html>

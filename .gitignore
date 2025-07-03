@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.sqlite3
+
+# Django
+*.log
+*.pot
+*.pyc
+*.pyo
+*.db
+mediafiles/
+staticfiles/
+
+# Environments
+.env
+.env.*
+/env
+/venv
+# Ignore qodo
+.qodo/
+
+# Node
+node_modules/
+.next/
+out/
+
+# System
+.DS_Store
+Thumbs.db
+
+# VSCode
+.vscode/
+
+# Don't ignore example envs
+!.env.example

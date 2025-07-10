@@ -158,3 +158,56 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:3001",
+    "http://127.0.0.1:3001",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+    # "https://sub.example.com",
+]
+
+CORS_ALLOW_METHODS = (
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+)
+
+CORS_ALLOW_HEADERS = (
+    "accept",
+    "authorization",
+    "content-type",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+)
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+    "https://throwin-backend.onrender.com",
+    "https://backend.throwin-glow.com",
+]
+
+SESSION_COOKIE_SECURE = False
+CORS_ALLOW_CREDENTIALS = True
+
+CSRF_USE_SESSIONS = True
+# CSRF_COOKIE_DOMAIN = 'localhost:5173'
+# CSRF_COOKIE_DOMAIN = 'core-sm.online'
+CSRF_COOKIE_DOMAIN = None  # Defaults to the current domain
+
+
+# SESSION_COOKIE_SAMESITE = "Lax"
+# CSRF_COOKIE_SAMESITE = "Lax"

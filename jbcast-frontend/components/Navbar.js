@@ -11,7 +11,8 @@ export default function Navbar() {
 
   const handleLogout = () => {
     // Clear token cookie
-    document.cookie = 'token=; Max-Age=0; path=/;';
+      localStorage.removeItem('access_token');
+      document.cookie = 'token=; Max-Age=0; path=/;';
     window.location.href = '/login';
   };
 

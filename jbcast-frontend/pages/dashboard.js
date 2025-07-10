@@ -14,8 +14,7 @@ export default function Dashboard() {
   const router = useRouter()
 
   const getToken = () => {
-    const match = document.cookie.match(/token=([^;]+)/)
-    return match ? match[1] : null
+    return localStorage.getItem('access_token');
   }
 
   const fetchFiles = async () => {

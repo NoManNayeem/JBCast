@@ -16,8 +16,7 @@ export default function FileDetail() {
   const [sendingAll, setSendingAll] = useState(false)
 
   const getToken = () => {
-    const match = document.cookie.match(/token=([^;]+)/)
-    return match ? match[1] : null
+    return localStorage.getItem('access_token');
   }
 
   const fetchFileDetails = async () => {

@@ -31,6 +31,7 @@ Thumbs.db
 
 # VSCode
 .vscode/
+.idea/
 
 # Don't ignore example envs
 !.env.example

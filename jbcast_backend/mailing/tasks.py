@@ -26,6 +26,8 @@ def process_uploaded_file(email_file_id):
         for _, row in df.iterrows():
             name = row.get('Name') or ''
             email = row.get('Email') or ''
+            subject = row.get('Subject') or ''
+            body = row.get('Body') or ''
             if not email:
                 continue
 
@@ -33,8 +35,8 @@ def process_uploaded_file(email_file_id):
                 file=email_file,
                 name=name,
                 email=email,
-                subject='',
-                body='',
+                subject=subject,
+                body=body,
                 cc='',
                 bcc='',
                 is_sent=False

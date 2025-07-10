@@ -1,3 +1,4 @@
+// pages/dashboard.js
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useRouter } from 'next/router'
@@ -11,10 +12,11 @@ export default function Dashboard() {
   const [title, setTitle] = useState('')
   const [file, setFile] = useState(null)
   const [uploading, setUploading] = useState(false)
+  const [sendingId, setSendingId] = useState(null)
   const router = useRouter()
 
   const getToken = () => {
-    return localStorage.getItem('access_token');
+    return localStorage.getItem('access_token')
   }
 
   const fetchFiles = async () => {
@@ -63,111 +65,129 @@ export default function Dashboard() {
   }
 
   const handleDelete = async (fileId) => {
-  if (!confirm('Are you sure you want to delete this file?')) return
-  try {
-    await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/files/${fileId}/delete/`, {
-      headers: {
-        Authorization: `Bearer ${getToken()}`
-      }
-    })
-    setFiles(files.filter(f => f.id !== fileId))
-  } catch (err) {
-    console.error('Delete failed:', err)
-    alert('Failed to delete file.')
+    if (!confirm('Are you sure you want to delete this file?')) return
+    try {
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/files/${fileId}/delete/`, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`
+        }
+      })
+      setFiles(files.filter(f => f.id !== fileId))
+    } catch (err) {
+      console.error('Delete failed:', err)
+      alert('Failed to delete file.')
+    }
   }
-}
 
+  const handleSendAll = async (fileId) => {
+    if (!confirm('Are you sure you want to send all emails?')) return
+    try {
+      setSendingId(fileId)
+      await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/files/${fileId}/send/`, {}, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`
+        }
+      })
+      alert('Emails sent successfully.')
+    } catch (err) {
+      console.error('Send all failed:', err)
+      alert('Failed to send emails.')
+    } finally {
+      setSendingId(null)
+    }
+  }
 
   const goToDetail = (id) => {
-    router.push(`/files/${id}`)  // ✅ Correct frontend route
+    router.push(`/files/${id}`)
   }
 
   return (
-    <>
-      <Navbar />
-      <main className="min-h-screen bg-gray-100 p-6">
-        <h1 className="text-2xl font-bold mb-6 flex items-center gap-2">
-          <MdUploadFile className="text-blue-600 text-3xl" />
-          Uploaded Files
-        </h1>
+      <>
+        <Navbar />
+        <main className="min-h-screen bg-gray-100 p-6">
+          <h1 className="text-2xl font-bold mb-6 flex items-center gap-2">
+            <MdUploadFile className="text-blue-600 text-3xl" />
+            Uploaded Files
+          </h1>
 
-        {/* Upload Section */}
-        <form
-          onSubmit={handleUpload}
-          className="bg-white p-4 rounded shadow-md mb-8 flex flex-col sm:flex-row items-center sm:space-x-4 space-y-4 sm:space-y-0"
-        >
-          <input
-            type="text"
-            placeholder="File Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="flex-1 px-3 py-2 border rounded w-full"
-            required
-          />
-          <input
-            type="file"
-            onChange={(e) => setFile(e.target.files[0])}
-            accept=".csv, .xls, .xlsx"
-            className="flex-1 w-full"
-            required
-          />
-          <button
-            type="submit"
-            disabled={uploading}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+          {/* Upload Section */}
+          <form
+              onSubmit={handleUpload}
+              className="bg-white p-4 rounded shadow-md mb-8 flex flex-col sm:flex-row items-center sm:space-x-4 space-y-4 sm:space-y-0"
           >
-            {uploading ? 'Uploading...' : 'Upload'}
-          </button>
-        </form>
+            <input
+                type="text"
+                placeholder="File Title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="flex-1 px-3 py-2 border rounded w-full"
+                required
+            />
+            <input
+                type="file"
+                onChange={(e) => setFile(e.target.files[0])}
+                accept=".csv, .xls, .xlsx"
+                className="flex-1 w-full"
+                required
+            />
+            <button
+                type="submit"
+                disabled={uploading}
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+            >
+              {uploading ? 'Uploading...' : 'Upload'}
+            </button>
+          </form>
 
-        {/* File List */}
-        {loading ? (
-          <p>Loading...</p>
-        ) : files.length === 0 ? (
-          <p>No files found.</p>
-        ) : (
-          <div className="bg-white shadow-md rounded overflow-x-auto">
-            <table className="min-w-full text-sm">
-              <thead className="bg-gray-100 text-left">
-                <tr>
-                  <th className="p-3">Title</th>
-                  <th className="p-3">Uploaded At</th>
-                  <th className="p-3 text-center">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {files.map((file) => (
-                  <tr key={file.id} className="border-t">
-                    <td className="p-3">{file.title}</td>
-                    <td className="p-3">{new Date(file.uploaded_at).toLocaleString()}</td>
-                    <td className="p-3 text-center space-x-2">
-                      <button
-                        onClick={() => goToDetail(file.id)}
-                        className="px-2 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600"
-                      >
-                        Details
-                      </button>
-                      <button
-                        disabled
-                        className="px-2 py-1 bg-green-500 text-white rounded text-xs hover:bg-green-600"
-                      >
-                        Send All
-                      </button>
-                      <button
-                        onClick={() => handleDelete(file.id)}
-                        className="px-2 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600"
-                      >
-                        Delete
-                      </button>
-                    </td>
+          {/* File List */}
+          {loading ? (
+              <p>Loading...</p>
+          ) : files.length === 0 ? (
+              <p>No files found.</p>
+          ) : (
+              <div className="bg-white shadow-md rounded overflow-x-auto">
+                <table className="min-w-full text-sm">
+                  <thead className="bg-gray-100 text-left">
+                  <tr>
+                    <th className="p-3">Title</th>
+                    <th className="p-3">Uploaded At</th>
+                    <th className="p-3 text-center">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </main>
-      <Footer />
-    </>
+                  </thead>
+                  <tbody>
+                  {files.map((file) => (
+                      <tr key={file.id} className="border-t">
+                        <td className="p-3">{file.title}</td>
+                        <td className="p-3">{new Date(file.uploaded_at).toLocaleString()}</td>
+                        <td className="p-3 text-center space-x-2">
+                          <button
+                              onClick={() => goToDetail(file.id)}
+                              className="px-2 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600"
+                          >
+                            Details
+                          </button>
+                          <button
+                              onClick={() => handleSendAll(file.id)}
+                              disabled={sendingId === file.id}
+                              className="px-2 py-1 bg-green-500 text-white rounded text-xs hover:bg-green-600 disabled:opacity-50"
+                          >
+                            {sendingId === file.id ? 'Sending...' : 'Send All'}
+                          </button>
+                          <button
+                              onClick={() => handleDelete(file.id)}
+                              className="px-2 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600"
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                  ))}
+                  </tbody>
+                </table>
+              </div>
+          )}
+        </main>
+        <Footer />
+      </>
   )
 }

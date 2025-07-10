@@ -26,5 +26,4 @@ urlpatterns = [
 
     # Delete File
     path('files/<int:pk>/delete/', EmailFileDeleteView.as_view(), name='email-file-delete'),
-
 ]

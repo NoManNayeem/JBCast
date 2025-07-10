@@ -36,7 +36,7 @@ export default function FileDetail() {
   const handleSend = async (recordId) => {
     setSendingId(recordId)
     try {
-      await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/email/${recordId}/send/`, {}, {
+      await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/email/${recordId}/send/`, {}, {
         headers: { Authorization: `Bearer ${getToken()}` }
       })
       fetchFileDetails()

@@ -1,11 +1,11 @@
 from rest_framework import serializers
 from .models import EmailFile, EmailRecord
 
-# ----------------------------------------
-# Email Record Serializer
-# Used inside file detail views
-# ----------------------------------------
+
 class EmailRecordSerializer(serializers.ModelSerializer):
+    """
+    Serializer for individual email records associated with an uploaded file.
+    """
     class Meta:
         model = EmailRecord
         fields = [
@@ -19,32 +19,35 @@ class EmailRecordSerializer(serializers.ModelSerializer):
         ]
 
 
-# ----------------------------------------
-# File Upload Serializer
-# Used when posting a new file
-# ----------------------------------------
 class EmailFileUploadSerializer(serializers.ModelSerializer):
+    """
+    Serializer used when uploading a new email file.
+    """
     class Meta:
         model = EmailFile
         fields = ['id', 'title', 'file', 'uploaded_at']
         read_only_fields = ['id', 'uploaded_at']
 
+    def validate_file(self, file):
+        allowed_types = ['.csv', '.xls', '.xlsx']
+        if not any(str(file.name).lower().endswith(ext) for ext in allowed_types):
+            raise serializers.ValidationError("Only .csv, .xls, and .xlsx files are allowed.")
+        return file
 
-# ----------------------------------------
-# File List Serializer
-# Used for displaying all uploaded files
-# ----------------------------------------
+
 class EmailFileListSerializer(serializers.ModelSerializer):
+    """
+    Serializer for listing uploaded files.
+    """
     class Meta:
         model = EmailFile
         fields = ['id', 'title', 'uploaded_at']
 
 
-# ----------------------------------------
-# File Detail Serializer
-# Used for showing file + nested email records
-# ----------------------------------------
 class EmailFileDetailSerializer(serializers.ModelSerializer):
+    """
+    Serializer for showing file detail along with nested email records.
+    """
     email_records = EmailRecordSerializer(many=True, read_only=True)
 
     class Meta:

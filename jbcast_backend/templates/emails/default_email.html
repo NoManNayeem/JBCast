@@ -1,80 +1,125 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>{{ subject|default:"Email from JBCast" }}</title>
+  <meta charset="UTF-8">
+  <title>{{ subject|default:"A Message from JB Connect Ltd." }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color: #2c3e50;
-      background-color: #f1f3f6;
+      background-color: #f8f9fb;
+      color: #2d2d2d;
       margin: 0;
       padding: 40px 0;
     }
+
     .container {
       background-color: #ffffff;
-      padding: 30px;
-      border-radius: 10px;
-      max-width: 640px;
+      padding: 35px;
+      border-radius: 12px;
+      max-width: 660px;
       margin: auto;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-      border-top: 6px solid #1a73e8;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      border-top: 6px solid #c27ba0; /* soft coral */
     }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .header img {
+      width: 180px;
+      max-width: 100%;
+      opacity: 0.95;
+    }
+
     h1 {
-      font-size: 22px;
-      color: #1a73e8;
+      font-size: 24px;
+      color: #408080; /* soft teal */
+      margin-top: 0;
       margin-bottom: 25px;
     }
+
     p {
-      line-height: 1.7;
       font-size: 15px;
+      line-height: 1.7;
       margin-bottom: 20px;
     }
+
     .signature {
+      margin-top: 30px;
+      font-weight: 500;
+      color: #444;
+    }
+
+    .ps {
+      font-size: 13px;
+      color: #666;
       margin-top: 30px;
       font-style: italic;
     }
-    .ps {
-      font-size: 14px;
-      color: #555;
-      margin-top: 20px;
-    }
+
     .footer {
       font-size: 12px;
       text-align: center;
-      color: #888;
-      margin-top: 50px;
+      color: #999;
+      margin-top: 60px;
     }
-    .logo {
+
+    .footer small {
       display: block;
-      margin: 20px auto 0;
-      width: 120px;
-      opacity: 0.8;
+      margin-top: 6px;
+      font-style: italic;
+    }
+
+    @media only screen and (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 20px;
+      }
+
+      .header img {
+        width: 140px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <p>Dear {{ name|default:"Valued Recipient" }},</p>
 
-    <p>{{ body|default:"We are reaching out to inform you of an update from JBCast. Please review the details provided or reach out to us for further information." }}</p>
+    <div class="header">
+      <img src="cid:jbc-logo.png" alt="JB Connect Ltd. Logo">
+    </div>
+
+    <h1>Dear {{ name|default:"Concern" }},</h1>
+
+    <p>
+      {{ body|default:"We hope this message finds you well. This email contains an important update from JB Connect Ltd. Please review the information below, and feel free to contact us should you require further assistance." }}
+    </p>
 
     <p class="signature">
       Best regards,<br>
       JBC HR
     </p>
 
-    <p class="ps"><strong><em>P.S. Please do not reply to this email. This is an automated message.</em></strong></p>
+    <p class="ps">This is a system-generated message. Do not reply to this.</p>
   </div>
 
   <div class="footer">
-    &copy; <span id="year"></span> JBC &mdash; MailBridge by JB Connect Ltd.<br>
-    <img src="cid:jbc-logo.png" alt="Logo" />
+    &copy; <span id="year">{{ now|date:"Y" }}</span>  
+    <small>Powered by JB Connect Ltd.</small>
   </div>
 
   <script>
-    document.getElementById("year").textContent = new Date().getFullYear();
+    // fallback in case Django template tag fails
+    if (document.getElementById("year").innerText.trim() === "") {
+      document.getElementById("year").textContent = new Date().getFullYear();
+    }
   </script>
 </body>
 </html>

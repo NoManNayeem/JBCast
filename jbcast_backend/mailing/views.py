@@ -1,3 +1,4 @@
+import logging
 from rest_framework import generics, permissions, status, views
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
@@ -9,8 +10,9 @@ from .serializers import (
     EmailFileListSerializer,
     EmailFileDetailSerializer,
 )
-
 from .tasks import process_uploaded_file, send_emails_for_file, send_email_record
+
+logger = logging.getLogger(__name__)
 
 
 # ----------------------------------------
@@ -24,13 +26,17 @@ class EmailFileUploadView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         file_instance = serializer.save(user=self.request.user)
-        # process_uploaded_file.delay(file_instance.id)
-        process_uploaded_file(file_instance.id)
+        try:
+            process_uploaded_file.delay(file_instance.id)
+        except Exception as e:
+            logger.exception("Failed to queue file processing task")
+            raise
 
     def create(self, request, *args, **kwargs):
         try:
             return super().create(request, *args, **kwargs)
         except Exception as e:
+            logger.error(f"Upload failed: {str(e)}")
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -61,6 +67,16 @@ class EmailFileDetailView(generics.RetrieveAPIView):
 
 
 # ----------------------------------------
+# Delete Email File (with all related records)
+# ----------------------------------------
+class EmailFileDeleteView(generics.DestroyAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return EmailFile.objects.filter(user=self.request.user)
+
+
+# ----------------------------------------
 # Trigger: Send all emails for a file
 # ----------------------------------------
 class SendAllEmailsView(views.APIView):
@@ -68,8 +84,12 @@ class SendAllEmailsView(views.APIView):
 
     def post(self, request, pk):
         email_file = get_object_or_404(EmailFile, id=pk, user=request.user)
-        send_emails_for_file.delay(email_file.id)
-        return Response({"message": "Email sending initiated."}, status=status.HTTP_202_ACCEPTED)
+        try:
+            send_emails_for_file.delay(email_file.id)
+            return Response({"message": "Email sending initiated."}, status=status.HTTP_202_ACCEPTED)
+        except Exception as e:
+            logger.error(f"Failed to trigger bulk send: {str(e)}")
+            return Response({"error": "Failed to initiate email sending."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # ----------------------------------------
@@ -82,19 +102,20 @@ class SendSingleEmailView(views.APIView):
         email_record = get_object_or_404(EmailRecord, id=pk, file__user=request.user)
 
         if email_record.is_sent:
-            return Response({"detail": "Email already sent."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"detail": "Email already sent."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
-        send_email_record.delay(email_record.id)
-        return Response({"message": f"Email sending queued for {email_record.email}."}, status=status.HTTP_202_ACCEPTED)
-
-
-# views.py
-from rest_framework import generics, permissions
-from .models import EmailFile
-from .serializers import EmailFileDetailSerializer
-
-class EmailFileDeleteView(generics.DestroyAPIView):
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_queryset(self):
-        return EmailFile.objects.filter(user=self.request.user)
+        try:
+            send_email_record.delay(email_record.id)
+            return Response(
+                {"message": f"Email sending queued for {email_record.email}."},
+                status=status.HTTP_202_ACCEPTED
+            )
+        except Exception as e:
+            logger.error(f"Failed to queue individual email: {str(e)}")
+            return Response(
+                {"error": "Failed to queue email for sending."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

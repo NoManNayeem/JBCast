@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -5,39 +6,75 @@
   <title>{{ subject|default:"Email from JBCast" }}</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      color: #333;
-      background: #f9f9f9;
-      padding: 20px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #2c3e50;
+      background-color: #f1f3f6;
+      margin: 0;
+      padding: 40px 0;
     }
     .container {
-      background: #ffffff;
-      padding: 20px;
-      border-radius: 6px;
-      max-width: 600px;
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 10px;
+      max-width: 640px;
       margin: auto;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+      border-top: 6px solid #1a73e8;
+    }
+    h1 {
+      font-size: 22px;
+      color: #1a73e8;
+      margin-bottom: 25px;
+    }
+    p {
+      line-height: 1.7;
+      font-size: 15px;
+      margin-bottom: 20px;
+    }
+    .signature {
+      margin-top: 30px;
+      font-style: italic;
+    }
+    .ps {
+      font-size: 14px;
+      color: #555;
+      margin-top: 20px;
     }
     .footer {
       font-size: 12px;
       text-align: center;
       color: #888;
-      margin-top: 20px;
+      margin-top: 50px;
+    }
+    .logo {
+      display: block;
+      margin: 20px auto 0;
+      width: 120px;
+      opacity: 0.8;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <p>Hi {{ name|default:"there" }},</p>
+    <p>Dear {{ name|default:"Valued Recipient" }},</p>
 
-    <p>{{ body|default:"You have a message from JBCast." }}</p>
+    <p>{{ body|default:"We are reaching out to inform you of an update from JBCast. Please review the details provided or reach out to us for further information." }}</p>
 
-    <p>Best regards,<br>
-    The JBCast Team</p>
+    <p class="signature">
+      Best regards,<br>
+      JBC HR
+    </p>
+
+    <p class="ps"><strong><em>P.S. Please do not reply to this email. This is an automated message.</em></strong></p>
   </div>
 
   <div class="footer">
-    &copy; {{ year|default:"2025" }} JBCast — MailBridge by JB
+    &copy; <span id="year"></span> JBC &mdash; MailBridge by JB Connect Ltd.<br>
+    <img src="cid:jbc-logo.png" alt="Logo" />
   </div>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>

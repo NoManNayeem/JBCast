@@ -1,5 +1,3 @@
-# Dockerfile
-
 FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -15,5 +13,8 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 # Copy all project files
 COPY . .
 
-# Default command (can be overridden by docker-compose)
+# Collect static files
+RUN python manage.py collectstatic --noinput
+
+# Default command
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

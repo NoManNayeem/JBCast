@@ -1,0 +1,59 @@
+services:
+  backend:
+    build:
+      context: ./jbcast_backend
+      dockerfile: Dockerfile
+    container_name: jbcast_web
+    command: gunicorn jbcast_backend.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - ./jbcast_backend:/app
+    ports:
+      - "8000:8000"
+    environment:
+      SECRET_KEY: your-django-secret-key
+      DEBUG: "True"
+      ALLOWED_HOSTS: 127.0.0.1,localhost,*
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_DB: 0
+      REDIS_PROTOCOL: redis
+    depends_on:
+      - redis
+
+  celery:
+    build:
+      context: ./jbcast_backend
+      dockerfile: Dockerfile
+    container_name: jbcast_celery
+    command: celery -A jbcast_backend worker --loglevel=info
+    volumes:
+      - ./jbcast_backend:/app
+    environment:
+      SECRET_KEY: your-django-secret-key
+      DEBUG: "True"
+      ALLOWED_HOSTS: 127.0.0.1,localhost
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_DB: 0
+      REDIS_PROTOCOL: redis
+    depends_on:
+      - backend
+      - redis
+
+  redis:
+    image: redis:7
+    container_name: jbcast_redis
+    ports:
+      - "6379:6379"
+
+  frontend:
+    build:
+      context: ./jbcast-frontend
+      dockerfile: Dockerfile
+    container_name: jbcast_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: http://backend:8000
+    depends_on:
+      - backend

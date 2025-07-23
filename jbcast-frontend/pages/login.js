@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import axios from 'axios'
+import { MdLock } from 'react-icons/md'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 
@@ -20,16 +21,12 @@ export default function Login() {
         password,
       })
 
-      // Set cookie with SameSite for middleware detection
       document.cookie = `token=${res.data.access}; path=/; SameSite=Lax`
-
-      // Optional: store token in localStorage too
       localStorage.setItem('access_token', res.data.access)
 
-      // Redirect after a short delay to ensure cookie is set
-      setTimeout(() => {
-        router.replace('/dashboard')
-      }, 100)
+      router.replace('/dashboard').then(() => {
+        window.location.reload()
+      })
     } catch (err) {
       setError('Invalid credentials')
     }
@@ -38,36 +35,64 @@ export default function Login() {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <form onSubmit={handleLogin} className="bg-white p-8 rounded shadow-md w-80">
-          <h2 className="text-xl font-bold mb-4 text-center">Login</h2>
+      <main className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-blue-50 px-4 py-16 text-gray-800">
+        <style jsx>{`
+          @keyframes fadeInUp {
+            0% {
+              opacity: 0;
+              transform: translateY(10px);
+            }
+            100% {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+          .animate-fade-in {
+            animation: fadeInUp 0.8s ease-out;
+          }
+        `}</style>
 
-          {error && <p className="text-red-600 text-sm mb-2">{error}</p>}
+        <div className="bg-white p-8 rounded-2xl shadow-md w-full max-w-md animate-fade-in space-y-6">
+          <div className="text-center">
+            <div className="flex justify-center mb-2">
+              <MdLock className="text-4xl text-blue-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-800">Login to JBCast</h2>
+            <p className="text-sm text-gray-500">Welcome back! Enter your credentials to continue.</p>
+          </div>
 
-          <input
-            type="text"
-            placeholder="Email or Username"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-3 py-2 border rounded mb-3"
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-3 py-2 border rounded mb-4"
-            required
-          />
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
-          >
-            Login
-          </button>
-        </form>
-      </div>
+          {error && (
+            <p className="text-red-600 text-sm text-center bg-red-50 py-2 px-3 rounded border border-red-300">
+              {error}
+            </p>
+          )}
+
+          <form onSubmit={handleLogin} className="space-y-4">
+            <input
+              type="text"
+              placeholder="Email or Username"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+            <button
+              type="submit"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg transition"
+            >
+              Login
+            </button>
+          </form>
+        </div>
+      </main>
       <Footer />
     </>
   )

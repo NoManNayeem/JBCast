@@ -181,7 +181,7 @@ def send_email_record(self, record_id):
         if record.is_sent:
             return f"Email {record.email} already sent."
 
-        smtp = SMTPAccount.objects.get(user=record.file.user)
+        smtp = SMTPAccount.objects.last()
 
         if smtp.last_reset.date() < timezone.now().date():
             smtp.emails_sent_today = 0

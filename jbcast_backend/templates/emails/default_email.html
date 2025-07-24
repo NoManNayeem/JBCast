@@ -5,13 +5,23 @@
   <meta charset="UTF-8">
   <title>{{ subject|default:"A Message from JB Connect Ltd." }}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    @media (prefers-color-scheme: dark) {
+      .logo-wrapper {
+        background-color: #ffffff !important;
+      }
+    }
+  </style>
 </head>
 <body style="margin: 0; padding: 40px 0; background-color: #f8f9fb; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
 
   <div style="background-color: #ffffff; padding: 30px; border-radius: 12px; max-width: 660px; margin: auto; box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08); border-top: 6px solid #5ba48f; border-bottom: 6px solid #5ba48f;">
 
-    <div style="text-align: center; margin-bottom: 24px; background-color: #ffffff; padding: 10px; border-radius: 50%; display: inline-block;">
-      <img src="cid:jbc-logo.png" alt="JB Connect Ltd. Logo" style="width: 160px; max-width: 100%; opacity: 0.95;">
+    <!-- Centered Logo Container -->
+    <div style="text-align: center; margin-bottom: 24px;">
+      <div class="logo-wrapper" style="background-color: #ffffff; padding: 12px; border-radius: 50%; display: inline-block;">
+        <img src="cid:jbc-logo.jpg" alt="JB Connect Ltd. Logo" style="width: 160px; max-width: 100%; display: block; opacity: 0.95;">
+      </div>
     </div>
 
     <h1 style="font-size: 16px; color: #000000; font-weight: bold; margin: 0 0 20px;">Dear {{ name|default:"Concern" }},</h1>
@@ -20,8 +30,8 @@
       {{ body|default:"We hope this message finds you well. This email contains an important update from JB Connect Ltd. Please review the information below, and feel free to contact us should you require further assistance." }}
     </p>
 
-    <!-- Confidentiality notice added here -->
-    <p style="font-size: 12px; line-height: 1.6; color: #000000; margin-bottom: 16px; font-weight: bold;">
+    <!-- Confidentiality notice -->
+    <p style="font-size: 10px; line-height: 1.6; color: #000000; margin-bottom: 16px; font-style: italic;">
       The hiring process you are going through is one that JBC and you are keeping completely private. All information about the hiring process should be considered private and confidential. It is extremely prohibited to disclose this private information.
     </p>
 
@@ -32,7 +42,7 @@
       JBC HR
     </p>
 
-    <p style="font-size: 11px; color: #555555; margin-top: 30px; font-style: italic;">
+    <p style="font-size: 11px; color: #555555; margin-top: 30px; font-style: italic; text-align: center;">
       This is a system-generated message. Do not reply to this.
     </p>
   </div>

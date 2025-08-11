@@ -14,25 +14,6 @@ import time
 logger = get_task_logger(__name__)
 
 
-def attach_inline_images(msg, image_names, image_dir):
-    """
-    Attach images to the email as inline attachments using Content-ID.
-    """
-    for image_name in image_names:
-        image_path = os.path.join(image_dir, image_name)
-        if os.path.exists(image_path):
-            try:
-                with open(image_path, 'rb') as img_file:
-                    mime_img = MIMEImage(img_file.read())
-                    mime_img.add_header('Content-ID', f'<{image_name}>')
-                    mime_img.add_header("Content-Disposition", "inline", filename=image_name)
-                    msg.attach(mime_img)
-            except Exception as e:
-                logger.error(f"Failed to attach image {image_name}: {str(e)}")
-        else:
-            logger.warning(f"Image not found: {image_path}")
-
-
 @shared_task(bind=True)
 def process_uploaded_file(self, email_file_id):
     logger.info(f"[TASK STARTED] Processing file: {email_file_id}")
@@ -105,8 +86,6 @@ def send_emails_for_file(self, email_file_id):
             return f"SMTP account for {file.user.email} is rate-limited."
 
         unsent_emails = file.email_records.filter(is_sent=False)
-        image_names = ["JB-Connect-Ltd.jpg"]
-        image_dir = os.path.join(settings.BASE_DIR, "templates", "emails")
 
         for record in unsent_emails:
             if smtp.emails_sent_today >= 500:
@@ -144,7 +123,6 @@ def send_emails_for_file(self, email_file_id):
                     connection=connection
                 )
                 msg.attach_alternative(html_content, "text/html")
-                attach_inline_images(msg, image_names, image_dir)
                 msg.send()
 
                 time.sleep(2)
@@ -223,7 +201,6 @@ def send_email_record(self, record_id):
             connection=connection
         )
         msg.attach_alternative(html_content, "text/html")
-        attach_inline_images(msg, ["JB-Connect-Ltd.jpg"], os.path.join(settings.BASE_DIR, "templates", "emails"))
         msg.send()
 
         record.is_sent = True

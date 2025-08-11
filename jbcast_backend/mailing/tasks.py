@@ -9,6 +9,7 @@ from django.core.mail import EmailMultiAlternatives, get_connection
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from .models import EmailFile, EmailRecord, SMTPAccount
+import time
 
 logger = get_task_logger(__name__)
 
@@ -103,14 +104,6 @@ def send_emails_for_file(self, email_file_id):
         if smtp.rate_limited:
             return f"SMTP account for {file.user.email} is rate-limited."
 
-        connection = get_connection(
-            host=smtp.email_host,
-            port=smtp.email_port,
-            username=smtp.email_host_user,
-            password=smtp.email_host_password,
-            use_tls=smtp.use_tls
-        )
-
         unsent_emails = file.email_records.filter(is_sent=False)
         image_names = ["jbc-logo.jpg"]
         image_dir = os.path.join(settings.BASE_DIR, "templates", "emails")
@@ -120,8 +113,17 @@ def send_emails_for_file(self, email_file_id):
                 smtp.rate_limited = True
                 smtp.save()
                 break
-
+            
+            connection = None
             try:
+                connection = get_connection(
+                    host=smtp.email_host,
+                    port=smtp.email_port,
+                    username=smtp.email_host_user,
+                    password=smtp.email_host_password,
+                    use_tls=smtp.use_tls
+                )
+                connection.open()
                 subject = record.subject or "No Subject"
                 from_email = smtp.email_host_user
                 to_email = [record.email]
@@ -145,6 +147,8 @@ def send_emails_for_file(self, email_file_id):
                 attach_inline_images(msg, image_names, image_dir)
                 msg.send()
 
+                time.sleep(2)
+
                 record.is_sent = True
                 record.send_attempts += 1
                 record.last_sent_at = timezone.now()
@@ -165,6 +169,9 @@ def send_emails_for_file(self, email_file_id):
                 record.last_sent_at = timezone.now()
                 record.error_message = error_msg
                 record.save()
+            finally:
+                if connection:
+                    connection.close()
 
         return f"Email sending task completed for file ID {file.id}"
 

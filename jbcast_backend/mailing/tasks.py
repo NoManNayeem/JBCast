@@ -105,7 +105,7 @@ def send_emails_for_file(self, email_file_id):
             return f"SMTP account for {file.user.email} is rate-limited."
 
         unsent_emails = file.email_records.filter(is_sent=False)
-        image_names = ["jbc-logo.jpg"]
+        image_names = ["JB-Connect-Ltd.jpg"]
         image_dir = os.path.join(settings.BASE_DIR, "templates", "emails")
 
         for record in unsent_emails:
@@ -223,7 +223,7 @@ def send_email_record(self, record_id):
             connection=connection
         )
         msg.attach_alternative(html_content, "text/html")
-        attach_inline_images(msg, ["jbc-logo.jpg"], os.path.join(settings.BASE_DIR, "templates", "emails"))
+        attach_inline_images(msg, ["JB-Connect-Ltd.jpg"], os.path.join(settings.BASE_DIR, "templates", "emails"))
         msg.send()
 
         record.is_sent = True

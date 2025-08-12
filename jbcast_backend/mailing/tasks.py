@@ -74,7 +74,7 @@ def process_uploaded_file(self, email_file_id):
 def send_emails_for_file(self, email_file_id):
     try:
         file = EmailFile.objects.get(id=email_file_id)
-        smtp = SMTPAccount.objects.get(user=file.user)
+        smtp = SMTPAccount.objects.last()
 
         if smtp.last_reset.date() < timezone.now().date():
             smtp.emails_sent_today = 0

@@ -111,11 +111,10 @@ def send_emails_for_file(self, email_file_id):
 
                 context = {'name': record.name, 'body': record.body or ''}
                 html_content = render_to_string("emails/default_email.html", context)
-                plain_content = strip_tags(html_content)
 
                 msg = EmailMultiAlternatives(
                     subject=subject,
-                    body=plain_content,
+                    body=html_content,
                     from_email=from_email,
                     to=to_email,
                     cc=cc_list,

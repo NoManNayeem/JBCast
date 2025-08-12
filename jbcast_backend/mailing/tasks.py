@@ -38,7 +38,7 @@ def process_uploaded_file(self, email_file_id):
         # Extract common subject/body from first row
         first_row = df.iloc[0]
         default_subject = str(first_row.get('Subject', '')).strip()
-        default_body = str(first_row.get('Body', '')).strip()
+        default_body = str(first_row.get('Body', '')).replace('\u2028', '\n')
 
         created_count = 0
         for _, row in df.iterrows():

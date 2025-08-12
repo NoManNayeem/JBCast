@@ -26,9 +26,9 @@
 
     <h1 style="font-size: 16px; color: #000000; font-weight: bold; margin: 0 0 20px;">Dear {{ name|default:"Concern" }},</h1>
 
-    <p style="font-size: 12px; line-height: 1.6; color: #000000; margin-bottom: 16px;">
-      {{ body|default:"We hope this message finds you well. This email contains an important update from JB Connect Ltd. Please review the information below, and feel free to contact us should you require further assistance." }}
-    </p>
+    <div style="font-size: 12px; line-height: 1.6; color: #000000; margin-bottom: 16px;">
+      {{ body|linebreaksbr|default:"We hope this message finds you well. This email contains an important update from JB Connect Ltd. Please review the information below, and feel free to contact us should you require further assistance." }}
+    </div>
 
     <!-- Confidentiality notice -->
     <p style="font-size: 10px; line-height: 1.6; color: #000000; margin-bottom: 16px; font-style: italic;">

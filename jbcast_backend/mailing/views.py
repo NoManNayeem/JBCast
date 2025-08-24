@@ -1,4 +1,5 @@
 import logging
+from django.db.models import Count, Q
 from rest_framework import generics, permissions, status, views
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
@@ -28,7 +29,7 @@ class EmailFileUploadView(generics.CreateAPIView):
         file_instance = serializer.save(user=self.request.user)
         try:
             process_uploaded_file.delay(file_instance.id)
-        except Exception as e:
+        except Exception:
             logger.exception("Failed to queue file processing task")
             raise
 
@@ -41,7 +42,7 @@ class EmailFileUploadView(generics.CreateAPIView):
 
 
 # ----------------------------------------
-# List Uploaded Files (for current user)
+# List Uploaded Files (for current user) + counts
 # ----------------------------------------
 class EmailFileListView(generics.ListAPIView):
     serializer_class = EmailFileListSerializer
@@ -50,11 +51,19 @@ class EmailFileListView(generics.ListAPIView):
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
             return EmailFile.objects.none()
-        return EmailFile.objects.filter(user=self.request.user).order_by('-uploaded_at')
+        return (
+            EmailFile.objects
+            .filter(user=self.request.user)
+            .annotate(
+                total_count=Count('email_records'),
+                sent_count=Count('email_records', filter=Q(email_records__is_sent=True)),
+            )
+            .order_by('-uploaded_at')
+        )
 
 
 # ----------------------------------------
-# Retrieve EmailFile with nested records
+# Retrieve EmailFile with nested records + counts
 # ----------------------------------------
 class EmailFileDetailView(generics.RetrieveAPIView):
     serializer_class = EmailFileDetailSerializer
@@ -63,7 +72,15 @@ class EmailFileDetailView(generics.RetrieveAPIView):
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
             return EmailFile.objects.none()
-        return EmailFile.objects.filter(user=self.request.user)
+        return (
+            EmailFile.objects
+            .filter(user=self.request.user)
+            .annotate(
+                total_count=Count('email_records'),
+                sent_count=Count('email_records', filter=Q(email_records__is_sent=True)),
+            )
+            .prefetch_related('email_records')
+        )
 
 
 # ----------------------------------------

@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings
+from urllib.parse import urlparse
 
 
 class EmailFile(models.Model):
@@ -29,6 +30,14 @@ class EmailRecord(models.Model):
     body = models.TextField(blank=True, null=True)
     cc = models.TextField(blank=True, null=True)
     bcc = models.TextField(blank=True, null=True)
+
+    # NEW: Comma-separated attachment URLs (parsed from "Attachments" column)
+    attachments_urls = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Comma-separated HTTP/HTTPS URLs to attachments."
+    )
+
     is_sent = models.BooleanField(default=False)
 
     # Tracking info
@@ -41,6 +50,27 @@ class EmailRecord(models.Model):
 
     def __str__(self):
         return f"{self.name} <{self.email}>"
+
+    @property
+    def attachments_list(self):
+        """
+        Returns a clean list of http(s) URLs from attachments_urls.
+        Trims whitespace and ignores empty/non-http(s) entries.
+        """
+        if not self.attachments_urls:
+            return []
+        items = [u.strip() for u in self.attachments_urls.split(',')]
+        out = []
+        for u in items:
+            if not u:
+                continue
+            try:
+                p = urlparse(u)
+                if p.scheme in ("http", "https"):
+                    out.append(u)
+            except Exception:
+                continue
+        return out
 
 
 class SMTPAccount(models.Model):

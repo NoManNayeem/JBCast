@@ -176,8 +176,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8000",
     'http://jbcast.jbc-ltd.com',
     'https://jbcast.jbc-ltd.com',
-    'http://13.201.81.251:8001'
-    'https://13.201.81.251:8001'
+    'http://13.201.81.251:8001',
+    'https://13.201.81.251:8001',
 ]
 
 CORS_ALLOW_METHODS = (
@@ -206,8 +206,8 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:8000",
     'http://jbcast.jbc-ltd.com',
     'https://jbcast.jbc-ltd.com',
-    'http://13.201.81.251:8001'
-    'https://13.201.81.251:8001'
+    'http://13.201.81.251:8001',
+    'https://13.201.81.251:8001',
 ]
 
 SESSION_COOKIE_SECURE = False

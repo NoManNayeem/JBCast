@@ -8,7 +8,7 @@ services:
     volumes:
       - ./jbcast_backend:/app
     ports:
-      - "8001:8001"
+      - "8000:8001"
     environment:
       SECRET_KEY: your-django-secret-key
       DEBUG: "True"

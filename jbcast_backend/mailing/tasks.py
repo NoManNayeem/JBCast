@@ -505,6 +505,11 @@ def send_email_record(self, record_id):
 
             msg.send()
 
+            try:
+                save_to_sent_folder(smtp, msg)
+            except Exception as e:
+                logger.warning(f"Could not save to Sent folder: {e}")
+
             # Mark sent + notes
             record.is_sent = True
             record.send_attempts += 1
@@ -552,3 +557,25 @@ def send_email_record(self, record_id):
         error_msg = str(e)[:500]
         logger.error(f"Fatal error sending email: {error_msg}")
         return f"Fatal error sending email: {error_msg}"
+
+
+import imaplib, time
+
+
+def save_to_sent_folder(smtp, email_message):
+    """
+    Save a fully prepared Django EmailMultiAlternatives (with attachments)
+    into the Sent folder via IMAP.
+    """
+    raw_message = email_message.message().as_bytes()
+
+    with imaplib.IMAP4_SSL("mail1014.onamae.ne.jp") as imap:
+        imap.login(smtp.email_host_user, smtp.email_host_password)
+        imap.append(
+            "Sent",  # confirmed from imap.list()
+            "",  # no flags
+            imaplib.Time2Internaldate(time.time()),
+            raw_message
+        )
+        imap.logout()
+

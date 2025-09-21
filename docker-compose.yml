@@ -4,7 +4,7 @@ services:
       context: ./jbcast_backend
       dockerfile: Dockerfile
     container_name: jbcast_web
-    command: gunicorn jbcast_backend.wsgi:application --bind 0.0.0.0:8000
+    command: gunicorn jbcast_backend.wsgi:application --bind 0.0.0.0:8001
     volumes:
       - ./jbcast_backend:/app
     ports:
